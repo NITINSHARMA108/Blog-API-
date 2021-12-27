@@ -5,11 +5,6 @@ const bcrypt = require('bcryptjs');
 const Blog = require('../models/blog');
 const User = require('../models/User');
 
-exports.get_blogs = async (req, res, next) => {
-  const blogs = await Blog.find({}).sort({ date: -1 });
-  res.status(200).json({ blogs });
-};
-
 exports.get_single_blog = async (req, res, next) => {
   const { id } = req.params;
   const blog = await Blog.findById(id);
@@ -28,30 +23,35 @@ exports.admin_signup = async (req, res, next) => { /* [
   if (!errors.isEmpty()) {
     return res.status(404).json({ errors: 'error in form data', error: errors });
   } */
-  console.log(req.body);
+
   bcrypt.genSalt(10, (err, salt) => {
     bcrypt.hash(req.body.password, salt, async (err, hash) => {
       if (err) {
+        console.log(`unable to encrypt password ${err}`);
         res.status(401).json({ message: `unable to encrypt password ${err}` });
       } else if (req.body.passcode === '325476') {
-        const checkExistence = await User.find({ username: req.body.username });
+        const checkExistence = await User.findOne({ username: req.body.username });
+        console.log(checkExistence);
         if (checkExistence) {
-          res.status(200).json({ message: 'user already exists' });
+          res.render('adminSignUp', { error: ['username already exists'] });
+        } else if (req.body.password.length < 6) {
+          res.render('adminSignUp', { error: ['password length should be minimum 6 characters long'] });
         } else {
           const response = await User.create({
             username: req.body.username,
             password: hash,
           });
+
           if (!response) {
-            res
-              .status(404)
-              .json({ error: 'error in uploading data to database' });
+            console.log('error in uploading data to database');
+            res.render('adminSignUp', { error: ['Some error occured \n please Try Again'] });
           } else {
-            res.status(200).json({ message: 'data uploaded successfully' });
+            console.log('data uploaded successfully');
+            res.render('adminSignIn');
           }
         }
       } else {
-        res.status(402).json({ message: 'passcode is not correct' });
+        res.render('adminSignUp', { error: ['passcode is incorrect'] });
       }
     });
   });
@@ -59,11 +59,8 @@ exports.admin_signup = async (req, res, next) => { /* [
 // ];
 
 exports.sign_in = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    res.status(200).json({ message: 'sign in successful' });
-  } else {
-    res.status(402).json({ message: 'unauthorized access' });
-  }
+  console.log(req.session);
+  res.redirect('/posts');
 };
 
 exports.redirect = (req, res, next) => {
@@ -73,9 +70,9 @@ exports.redirect = (req, res, next) => {
 exports.signout = (req, res, next) => {
   if (req.isAuthenticated()) {
     req.logout();
-    res.redirect('/login');
+    res.redirect('/posts');
   } else {
-    next('session timed out');
+    res.redirect('/posts');
   }
 };
 
@@ -85,4 +82,12 @@ exports.check_authentication = (req, res, next) => {
   } else {
     res.status(400).json({ message: 'user unauthorized' });
   }
+};
+
+exports.get_signin = (req, res, next) => {
+  res.render('adminSignIn');
+};
+
+exports.get_signup = (req, res, next) => {
+  res.render('adminSignup');
 };

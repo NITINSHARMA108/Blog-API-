@@ -1,36 +1,22 @@
-const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const passport = require('passport');
 const User = require('../models/User');
 
-const verify = (username, password, done) => {
-  User.findOne({ username }, async (err, user) => {
-    if (err) {
-      return done(err);
-    }
+passport.use(
+  new LocalStrategy(async (username, password, done) => {
+    const user = await User.findOne({ username });
     if (!user) {
-      return done(null, false);
+      done(null, false, { message: 'user not found' });
+    } else {
+      const response = await bcrypt.compare(password, user.password);
+      console.log('in bcrypt', response);
+      done(null, user);
     }
-
-    bcrypt
-      .compare(password, user.password)
-      .then((res) => {
-        if (res) {
-          return done(null, user);
-        }
-
-        return done(null, false);
-      })
-      .catch((error) => done(error));
-  });
-};
-
-const strategy = new LocalStrategy(verify);
-
-passport.use(strategy);
-
+  }),
+);
 passport.serializeUser((user, done) => {
+  console.log('serialize');
   done(null, user.id);
 });
 

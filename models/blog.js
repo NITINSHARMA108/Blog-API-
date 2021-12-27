@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { DateTime } = require('luxon');
 
 const { Schema } = mongoose;
 
@@ -24,5 +25,16 @@ const Blog = new Schema({
     default: new Date().toLocaleString('en-US', { timezone: 'Asia/Kolkata' }),
   },
 });
+
+Blog
+  .virtual('formal_date')
+  .get(() => {
+    console.log(this.date);
+    /* const day = this.date.getDate();
+    const month = this.date.getMonth();
+    const year = this.date.getFullYear();
+    return `${day}/${month}/${year}`; */
+    return this.date;
+  });
 
 module.exports = mongoose.model('Blog', Blog);
