@@ -10,7 +10,6 @@ passport.use(
       done(null, false, { message: 'user not found' });
     } else {
       const response = await bcrypt.compare(password, user.password);
-      console.log('in bcrypt', response);
       done(null, user);
     }
   }),

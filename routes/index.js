@@ -9,32 +9,36 @@ router.get('/', userController.redirect);
 
 router.get('/posts', blogController.get_blogs);
 
-router.get('/posts/:id', userController.get_single_blog);
+router.get('/post/:id', blogController.get_blog);
 
-router.get('/admin_signin', userController.get_signin);
+router.post('/post/:id/post_comment', blogController.post_comments);
 
-router.get('/admin_signup', userController.get_signup);
-
-router.post('/admin_signin', passport.authenticate('local'), userController.sign_in);
-
-router.post('/admin_signup', userController.admin_signup);
-
+// delete blog
 router.post('/delete_blog/:id', blogController.delete_blog);
 
-router.post('/update_blog', blogController.post_update_blog);
+// create blog
+router.get('/createBlog', blogController.createBlog);
 
 router.post('/create_blog', blogController.create_blog);
 
-router.get('/check_authentication', userController.check_authentication);
+// update blog
+router.get('/update_blog/:id', blogController.get_updateBlog);
 
-router.post('/post_comment', blogController.post_comments);
+router.post('/update_blog/:id', blogController.post_update_blog);
 
+// admin Sign In
+router.get('/admin_signin', userController.get_signin);
+
+router.post('/admin_signin', passport.authenticate('local'), userController.sign_in);
+
+// admin Sign Up
+router.get('/admin_signup', userController.get_signup);
+
+router.post('/admin_signup', userController.admin_signup);
+
+// admin Sign Out
 router.post('/admin_signout', userController.signout);
 
-router.get('/post/:id', blogController.get_blog);
-
-router.get('/createBlog', blogController.createBlog);
-
-router.get('/update_blog/:id', blogController.get_updateBlog);
+router.get('/check_authentication', userController.check_authentication);
 
 module.exports = router;

@@ -14,9 +14,11 @@
   </head>
   <body>
     <div class="container">
-      <a href="/"
-        ><button type="button" class="btn btn-success mb-4">Home</button></a
-      >
+      <div class="d-flex justify-content-center">
+        <a href="/">
+          <button type="button" class="btn btn-success mb-4">Home</button>
+        </a>
+      </div>
       <div class="row">
         <div class="col-12 col-sm-12 col-md-6">
           <form
@@ -25,7 +27,7 @@
             action="/admin_signin"
           >
             <h1>Sign In</h1>
-            <%- include('./partials/error.ejs') %> 
+            <%- include('./partials/error.ejs') %>
             <div class="form-group">
               <label for="username">Username</label>
               <input

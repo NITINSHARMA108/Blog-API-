@@ -17,68 +17,58 @@ exports.delete_blog = async (req, res, next) => {
   if (req.isAuthenticated()) {
     const response = await Blog.findByIdAndDelete(id);
     if (!response) {
-      res.status(404).json({ message: 'unable to delete' });
+      res.redirect(`/post/${id}`);
     } else {
-      res.status(200).json({ message: 'successful deletion' });
+      res.redirect('/posts');
     }
   } else {
-    res.status(404).json({ message: 'authentication error' });
+    res.render('adminSignIn', { error: ['Session Timed Out'] });
   }
 };
 
-/* exports.get_update_blog = async (req, res, next) => {
+exports.post_update_blog = async (req, res, next) => {
   const { id } = req.params;
   if (req.isAuthenticated()) {
-    const response = await findById(id);
-    if (response) {
-      res.status(200).json({ blog: response });
-    } else {
-      res.status(404).json({ error: 'request not found' });
-    }
-  } else {
-    res.status(401).json({ error: '' });
-  }
-}; */
-
-exports.post_update_blog = async (req, res, next) => {
-  if (req.isAuthenticated()) {
-    const response = await Blog.findByIdAndUpdate(req.body.id, {
-      title: req.boddy.title,
+    const response = await Blog.findByIdAndUpdate(id, {
+      title: req.body.title,
       content: req.body.content,
       status: req.body.status,
     });
+    res.redirect(`/post/${id}`);
   } else {
-    res.staus(402).json({ message: 'unauthorized access' });
+    res.render('adminSignIn', { error: ['Session Timed Out'] });
   }
 };
 
 exports.create_blog = async (req, res, next) => {
-  const response = await Blog.create({
-    title: req.body.title,
-    content: req.body.content,
-    comments: [],
-    status: req.body.status,
-  });
-  if (!response) {
-    res.status(402).json({ message: 'not able to update database' });
+  if (req.isAuthenticated()) {
+    const response = await Blog.create({
+      title: req.body.title,
+      content: req.body.content,
+      comments: [],
+      status: req.body.status,
+    });
+    if (!response) {
+      res.render('createBlog', { error: ['Some eror occured'] });
+    } else {
+      res.redirect('/posts');
+    }
   } else {
-    res.status(200).json({ message: 'successfully uploaded' });
+    res.render('adminSignIn', { error: ['Session Timed out'] });
   }
 };
 
 exports.post_comments = async (req, res, next) => {
-  const { id, name, comment } = req.body;
+  const { name, comment } = req.body;
+  const { id } = req.params;
   const response = await Blog.findById(id);
   const { comments } = response;
   comments.push({ name, comment });
   const updatedResponse = await Blog.findByIdAndUpdate(id, {
     comments,
   });
-  if (updatedResponse) {
-    res.status(200).json({ message: 'successful updated' });
-  } else {
-    res.status(400).json({ message: 'error in updation' });
-  }
+  const isAdmin = req.isAuthenticated();
+  res.redirect(`/post/${id}`);
 };
 
 exports.get_blog = async (req, res, next) => {
@@ -93,7 +83,11 @@ exports.get_blog = async (req, res, next) => {
 };
 
 exports.createBlog = (req, res, next) => {
-  res.render('createBlog');
+  if (req.isAuthenticated()) {
+    res.render('createBlog');
+  } else {
+    res.render('adminSignIn', { error: ['Session Time Out'] });
+  }
 };
 
 exports.get_updateBlog = async (req, res, next) => {
