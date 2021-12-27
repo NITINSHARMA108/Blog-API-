@@ -9,13 +9,18 @@ passport.use(
     if (!user) {
       done(null, false, { message: 'user not found' });
     } else {
-      const response = await bcrypt.compare(password, user.password);
-      done(null, user);
+      bcrypt.compare(password, user.password)
+        .then((res) => {
+          if (res) {
+            return done(null, user);
+          }
+          return done(null, false, { message: 'password not matched' });
+        })
+        .catch((err) => done(err));
     }
   }),
 );
 passport.serializeUser((user, done) => {
-  console.log('serialize');
   done(null, user.id);
 });
 

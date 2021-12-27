@@ -4,10 +4,8 @@ const Blog = require('../models/blog');
 exports.get_blogs = async (req, res, next) => {
   const blogs = await Blog.find({}).sort({ date: -1 });
   if (req.isAuthenticated()) {
-    console.log('hello');
     res.render('Blogs', { blogs, isAdmin: true });
   } else {
-    console.log('no hello');
     res.render('Blogs', { blogs, isAdmin: false });
   }
 };
@@ -74,7 +72,6 @@ exports.post_comments = async (req, res, next) => {
 exports.get_blog = async (req, res, next) => {
   const { id } = req.params;
   const response = await Blog.findById(id);
-  console.log(response);
   if (req.isAuthenticated()) {
     res.render('Blog_post', { blog: response, isAdmin: true });
   } else {

@@ -29,7 +29,7 @@ router.post('/update_blog/:id', blogController.post_update_blog);
 // admin Sign In
 router.get('/admin_signin', userController.get_signin);
 
-router.post('/admin_signin', passport.authenticate('local'), userController.sign_in);
+router.post('/admin_signin', passport.authenticate('local', { failureRedirect: '/admin_signin' }), userController.sign_in);
 
 // admin Sign Up
 router.get('/admin_signup', userController.get_signup);

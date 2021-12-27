@@ -22,16 +22,15 @@ const Blog = new Schema({
   },
   date: {
     type: Date,
-    default: Date.now(), // new Date().toLocaleString('en-US', { timezone: 'Asia/Kolkata' }),
+    default: new Date().toLocaleString('en-US', { timezone: 'Asia/Kolkata' }),
   },
 });
 
-Blog.virtual('formal_date').get(() => {
-  console.log(this.date);
-  const day = this.date.getDate();
-  const month = this.date.getMonth() + 1;
-  const year = this.date.getFullYear();
-  return `${day}/${month}/${year}`;
+Blog.virtual('formal_date').get(function () {
+  const formalDate = DateTime.fromJSDate(this.date).toLocaleString(
+    DateTime.DATETIME_MED,
+  );
+  return formalDate;
 });
 
 module.exports = mongoose.model('Blog', Blog);

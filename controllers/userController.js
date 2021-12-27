@@ -27,11 +27,10 @@ exports.admin_signup = async (req, res, next) => { /* [
   bcrypt.genSalt(10, (err, salt) => {
     bcrypt.hash(req.body.password, salt, async (err, hash) => {
       if (err) {
-        console.log(`unable to encrypt password ${err}`);
         res.status(401).json({ message: `unable to encrypt password ${err}` });
       } else if (req.body.passcode === '325476') {
         const checkExistence = await User.findOne({ username: req.body.username });
-        console.log(checkExistence);
+
         if (checkExistence) {
           res.render('adminSignUp', { error: ['username already exists'] });
         } else if (req.body.password.length < 6) {
@@ -43,10 +42,8 @@ exports.admin_signup = async (req, res, next) => { /* [
           });
 
           if (!response) {
-            console.log('error in uploading data to database');
             res.render('adminSignUp', { error: ['Some error occured \n please Try Again'] });
           } else {
-            console.log('data uploaded successfully');
             res.render('adminSignIn');
           }
         }
@@ -59,7 +56,6 @@ exports.admin_signup = async (req, res, next) => { /* [
 // ];
 
 exports.sign_in = (req, res, next) => {
-  console.log(req.session);
   res.redirect('/posts');
 };
 
@@ -85,9 +81,17 @@ exports.check_authentication = (req, res, next) => {
 };
 
 exports.get_signin = (req, res, next) => {
-  res.render('adminSignIn');
+  if (req.isAuthenticated()) {
+    res.redirect('/posts');
+  } else {
+    res.render('adminSignIn');
+  }
 };
 
 exports.get_signup = (req, res, next) => {
-  res.render('adminSignup');
+  if (req.isAuthenticated()) {
+    res.redirect('/posts');
+  } else {
+    res.render('adminSignUp');
+  }
 };
